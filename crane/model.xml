@@ -1,0 +1,144 @@
+<mujoco model="crane">
+  <compiler angle="degree" coordinate="local" inertiafromgeom="false"/>
+
+  <option gravity="0 0 -9.81" timestep="0.0002"/>
+
+  <default>
+    <!-- Geoms are visual/contact only (massless). All mass/inertia comes from <inertial>. -->
+    <geom density="0"
+          contype="1" conaffinity="1"
+          friction="0.8 0.1 0.1"/>
+    <joint limited="true"
+           armature="0.01"
+           frictionloss="0.0"/>
+  </default>
+
+  <asset>
+    <texture type="skybox" builtin="gradient"
+             rgb1="0.4 0.5 0.8" rgb2="0.3 0.3 0.3"
+             width="512" height="512"/>
+
+    <texture name="tile_tex" type="2d"
+             builtin="checker"
+             rgb1="0.92 0.92 0.92" rgb2="0.86 0.86 0.86"
+             mark="edge" markrgb="0.55 0.55 0.55"
+             width="1024" height="1024"/>
+
+    <material name="tile_mat" texture="tile_tex"
+              texrepeat="8 8" texuniform="true"
+              specular="0.4" shininess="0.8"
+              reflectance="0.05"/>
+
+    <material name="table_wood" rgba="1.0 0.753 0.549 1" specular="0.2" shininess="0.3"/>
+    <material name="ceramic"    rgba="0.85 0.85 0.88 1"  specular="0.6" shininess="0.9"/>
+  </asset>
+
+  <contact>
+    <!-- Common “don’t self-collide” exclusions for the pendulum under the bridge -->
+    <exclude body1="bar"     body2="beam3"/>
+    <exclude body1="payload" body2="beam3"/>
+    <exclude body1="bar"     body2="cursor_1"/>
+    <exclude body1="payload" body2="cursor_1"/>
+  </contact>
+
+  <worldbody>
+    <!-- Floor (optional but useful) -->
+    <geom name="floor" type="plane" pos="0 0 0" size="10 10 0.1"
+          material="tile_mat" contype="1" conaffinity="1"/>
+
+    <!-- Fixed portal structure -->
+    <body name="chassis" pos="0 0 0.1">
+      <inertial pos="0 0 0"
+                mass="1.0"
+                diaginertia="0.01 0.01 0.01"/>
+
+      <!-- Legs -->
+      <geom name="leg1_geom" type="box" size="0.05 0.05 1.0" pos="-1 -1 1" rgba="0.2 0.2 0.2 1"/>
+      <geom name="leg2_geom" type="box" size="0.05 0.05 1.0" pos=" 1 -1 1" rgba="0.2 0.2 0.2 1"/>
+      <geom name="leg3_geom" type="box" size="0.05 0.05 1.0" pos="-1  1 1" rgba="0.2 0.2 0.2 1"/>
+      <geom name="leg4_geom" type="box" size="0.05 0.05 1.0" pos=" 1  1 1" rgba="0.2 0.2 0.2 1"/>
+
+      <!-- Top beams -->
+      <geom name="beam1_geom" type="box" size="1.0 0.05 0.05" pos="0 -1 2" rgba="0.2 0.2 0.2 1"/>
+      <geom name="beam2_geom" type="box" size="1.0 0.05 0.05" pos="0  1 2" rgba="0.2 0.2 0.2 1"/>
+
+      <!-- ---------------------------- -->
+      <!-- Motorized trolley (X-slide)  -->
+      <!-- ---------------------------- -->
+      
+      <body name="cursor_1" pos="-0.36 -1 2.1">
+        <inertial pos="0 0 0"
+                  mass="0.5"
+                  diaginertia="0.000866667 0.000866667 0.0012"/>
+
+        <!-- ONLY ACTUATED JOINT -->
+        <joint name="joint_1" type="slide" axis="1 0 0" range="-0.53 1.2"/>
+
+        <geom name="cursor_1_geom" type="box" size="0.06 0.06 0.05" rgba="0.2 0.5 0.9 1"/>
+
+        <!-- ---------------------------------------------------------- -->
+        <!-- Bridge beam rigidly attached to trolley; pendulum under it -->
+        <!-- ---------------------------------------------------------- -->
+        <body name="beam3" pos="0.12 0 0">
+          <inertial pos="0 1 0"
+                    mass="1.0"
+                    diaginertia="0.334167 0.001667 0.334167"/>
+
+          <geom name="beam3_geom" type="box"
+                size="0.05 1.0 0.05"
+                pos="0 1 0"
+                rgba="0.8 0.8 0.8 1"/>
+
+          <!-- Mount under the beam (rigid) -->
+          <body name="hook_mount" pos="0 1 -0.12">
+            <geom name="carriage_geom" type="box"
+                  size="0.05 0.05 0.05"
+                  rgba="0.3 0.3 0.3 1"/>
+
+            <!-- ---------------------------- -->
+            <!-- Passive pendulum (hinge J2)  -->
+            <!-- ---------------------------- -->
+            
+            <body name="bar" pos="0 0 -0.12">
+              <!-- PASSIVE HINGE: no actuator attached -->
+              <!-- axis="0 1 0" => swing in x-z plane (trolley moves along x) -->
+              <joint name="joint_2" type="hinge"
+                     axis="0 1 0"
+                     range="-3600.14 3600.14"
+                     damping="0.0"/>
+
+              <!-- Bar as a capsule from hinge to end -->
+              <geom name="bar_geom" type="capsule"
+                    fromto="0 0 0  0 0 -0.8"
+                    size="0.015"
+                    rgba="0.9 0.9 0.2 1"/>
+
+              <!-- Put the bar COM at mid-length -->
+              <inertial pos="0 0 -0.4"
+                        mass="0.2"
+                        diaginertia="0.0005 0.0005 0.0001"/>
+
+              <!-- Payload rigidly attached at the end of the bar -->
+              <body name="payload" pos="0 0 -0.8">
+                <inertial pos="0 0 0"
+                          mass="2.5"
+                          diaginertia="0.001 0.001 0.001"/>
+
+                <geom name="payload_geom" type="sphere"
+                      size="0.05"
+                      rgba="0.9 0.3 0.3 1"/>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <motor name="motor_1" joint="joint_1"
+           ctrllimited="true" ctrlrange="-300 300"
+           forcelimited="true" forcerange="-300 300"
+           gear="1"/>
+  </actuator>
+</mujoco>

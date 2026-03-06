@@ -1,0 +1,26 @@
+controller:
+  cascade_controllers:
+  cascade_controllers:
+  - name: "joint1"
+    inner:
+      Kp: 125.0
+      Ki: 2.0
+      Kd: 0.0
+    outer:
+      Kp: 15.0
+      Ki: 0.0
+      Kd: 0.0
+
+model_parameters:
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+- 0.0

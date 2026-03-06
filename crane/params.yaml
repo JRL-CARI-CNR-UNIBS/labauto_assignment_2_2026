@@ -1,0 +1,105 @@
+model:
+  name: crane
+
+option:
+  gravity: "0 0 -9.81"
+  timestep: 0.0002
+
+geom:
+  friction_default: "0.8 0.1 0.1"
+  rgba_default: "0.7 0.7 0.7 1"
+
+# World->chassis fixed offset (kept for compatibility with your previous setup)
+chassis:
+  z0: 0.1
+
+# Portal appearance + geometry (MJCF uses HALF-SIZES for boxes)
+portal:
+  rgba: "0.2 0.2 0.2 1"
+  leg:
+    size: "0.05 0.05 1.0"   # 0.10 x 0.10 x 2.00 m
+    rgba: "0.2 0.2 0.2 1"
+  beam_x:
+    size: "1.0 0.05 0.05"   # 2.00 x 0.10 x 0.10 m
+    rgba: "0.2 0.2 0.2 1"
+
+# Moving trolley (HALF-SIZES)
+cursor:
+  size: "0.06 0.06 0.05"
+  rgba: "0.2 0.5 0.9 1"
+
+# Small rigid mount block under the bridge (HALF-SIZES)
+carriage:
+  size: "0.05 0.05 0.05"
+  rgba: "0.3 0.3 0.3 1"
+
+# Bridge beam attached to trolley: 2m long along +y (HALF-SIZES)
+# Geom is centered at y=+1 in its local frame so it spans y in [0, 2] locally.
+beam3:
+  size: "0.05 1.0 0.05"
+  pos:  "0 1 0"
+  rgba: "0.8 0.8 0.8 1"
+
+# Suspension point under beam3 (local frame of beam3)
+# Default: midpoint under the beam.
+hook_mount:
+  pos: "0 1 0"
+
+# Passive pendulum link (hinge at hook_mount, link extends down -z)
+bar:
+  length: 0.80           # meters (hinge to payload center)
+  radius: 0.015          # capsule radius
+  rgba: "0.9 0.9 0.2 1"
+
+# Payload rigidly attached at end of bar
+payload:
+  geom_type: sphere
+  size: "0.05"           # sphere radius (single value as string)
+  rgba: "0.9 0.3 0.3 1"
+
+joints:
+  armature: 0.01
+  frictionloss: 0.0
+
+  # Motorized trolley slide (X). Range matches your prior convention.
+  motor_range_x: "-0.53 1.2"
+
+  # Passive hinge (J2)
+  hinge_axis: "0 1 0"      # swing in x-z plane for x-trolley excitation
+  hinge_range: "-3.14 3.14"
+  hinge_damping: 0.0
+
+actuators:
+  ctrlrange: "-300 300"
+  gear: [1]
+  forcerange: ["-300 300"]
+
+# Inertial properties (kg, kg*m^2) about COM in each link frame.
+# Portal links are fixed; inertias matter mainly for engines that enforce them.
+inertial:
+  chassis:
+    com: "0 0 0"
+    mass: 1.0
+    I: "0.01 0.01 0.01"
+
+  cursor_1:
+    com: "0 0 0"
+    mass: 0.5
+    I: "0.000866667 0.000866667 0.0012"
+
+  beam3:
+    com: "0 1 0"
+    mass: 1.0
+    I: "0.334167 0.001667 0.334167"
+
+  # Pendulum link (about its own COM; COM is at mid-length in MJCF template)
+  bar:
+    mass: 0.2
+    I: "0.0005 0.0005 0.0001"
+
+  payload:
+    com: "0 0 0"
+    mass: 10.0
+    I: "0.001 0.001 0.001"
+
+
