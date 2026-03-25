@@ -91,6 +91,9 @@
 
           <!-- Mount under the beam (rigid) -->
           <body name="hook_mount" pos="0 1 -0.12">
+          <inertial pos="0 1 0"
+                    mass="1.0"
+                    diaginertia="0.334167 0.001667 0.334167"/>
             <geom name="carriage_geom" type="box"
                   size="0.05 0.05 0.05"
                   rgba="0.3 0.3 0.3 1"/>
@@ -109,19 +112,19 @@
 
               <!-- Bar as a capsule from hinge to end -->
               <geom name="bar_geom" type="capsule"
-                    fromto="0 0 0  0 0 -0.8"
+                    fromto="0 0 0  0 0 -0.6167502654093481"
                     size="0.015"
                     rgba="0.9 0.9 0.2 1"/>
 
               <!-- Put the bar COM at mid-length -->
-              <inertial pos="0 0 -0.4"
+              <inertial pos="0 0 -0.30837513270467404"
                         mass="0.2"
                         diaginertia="0.0005 0.0005 0.0001"/>
 
               <!-- Payload rigidly attached at the end of the bar -->
-              <body name="payload" pos="0 0 -0.8">
+              <body name="payload" pos="0 0 -0.6167502654093481">
                 <inertial pos="0 0 0"
-                          mass="2.5"
+                          mass="10.0"
                           diaginertia="0.001 0.001 0.001"/>
 
                 <geom name="payload_geom" type="sphere"
