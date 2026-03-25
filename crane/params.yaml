@@ -37,7 +37,7 @@ carriage:
 # Geom is centered at y=+1 in its local frame so it spans y in [0, 2] locally.
 beam3:
   size: "0.05 1.0 0.05"
-  pos:  "0 1 0"
+  pos: "0 1 0"
   rgba: "0.8 0.8 0.8 1"
 
 # Suspension point under beam3 (local frame of beam3)
@@ -47,7 +47,7 @@ hook_mount:
 
 # Passive pendulum link (hinge at hook_mount, link extends down -z)
 bar:
-  length: 0.80           # meters (hinge to payload center)
+  length: 0.6196270862172015 # meters (hinge to payload center)
   radius: 0.015          # capsule radius
   rgba: "0.9 0.9 0.2 1"
 
